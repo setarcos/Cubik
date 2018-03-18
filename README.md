@@ -25,6 +25,7 @@ Cubik
 + **double click** on a face to activate it, then rotate
 + **double click** at any point not on the cube to deactivate face selection and back to view mode
 + when a face is activated, **Ctrl+(left|right|wheel)** mouse buttons enables temporary view mode without exiting the interactive mode
++ press **(U|D|F|B|R|L)** to rotate the faces
 
 #### Hint Mode: guide to a solution
 + press **H** to toggle hint mode (next move and number of moves left shown on top left)
@@ -38,7 +39,10 @@ Cubik
 sudo apt-get install mesa-common-dev
 sudo apt-get install libglu1-mesa-dev -y
 ```
-+ **libQGLViewer**: Cubik replies heavily on the library [libQGLViewer](http://www.libqglviewer.com/), which is a C++ library based on Qt that eases the creation of OpenGL 3D viewers. We have already included the header files and compiled libraries (under Ubuntu 14.04 LTS) to Cubik. As long as you have Qt and GLU installed, you should be fine.
++ **libQGLViewer**: Cubik replies heavily on the library [libQGLViewer](http://www.libqglviewer.com/), which is a C++ library based on Qt that eases the creation of OpenGL 3D viewers. Install the library if necessary.
+```
+sudo apt-get install libqglviewer-dev-qt5
+```
 
 #### Compilation
 This compilation procedure has been tested on multiple independent machines running Ubuntu 14.04 LTS (Trusty Tahr).
@@ -49,10 +53,6 @@ git clone https://github.com/trgao10/Cubik
 cd Cubik/
 qmake
 make
-```
-After the compilation, you need to specify the path to load shared libarary "libQGLViewer.so":
-```
-export LD_LIBRARY_PATH=./lib:$LD_LIBRARY_PATH
 ```
 That's all. Happy Cubik-ing!
 ```
