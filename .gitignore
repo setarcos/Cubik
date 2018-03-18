@@ -3,3 +3,5 @@
 Cubik
 log.txt
 demo/
+Makefile
+.qmake*
