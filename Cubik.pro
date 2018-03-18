@@ -10,7 +10,8 @@ CONFIG += qt opengl warn_on thread rtti console c++11 ggdb3
 
 QMAKE_LIBS_OPENGL *= -lGLU
 
-INCLUDEPATH *= ./include
-LIBS *= -L./lib -lQGLViewer
+LIBS *= -lQGLViewer-qt5
+#INCLUDEPATH *= ./include
+#LIBS *= -L./lib -lQGLViewer
 
 
