@@ -1,4 +1,5 @@
 #include <QGLViewer/manipulatedCameraFrame.h>
+#include <QDebug>
 #include "Cubik.h"
 #include "solveCube.cpp"
 
@@ -270,23 +271,7 @@ void Viewer::endSelection(const QPoint& point) {
     setSelectedName(selectedIdx);
 }
 
-void Viewer::postSelection(const QPoint&) {
-    if ((manipulatedFrame()->isSpinning()) || cubik.checkResumeSpinning())
-        return;
-    
-    cubik.updateEdgeCornerPosition();
-    if (selectedName() == -1) {
-        setManipulatedFrame(camera()->frame());
-        cubik.setSelectedFrameNumber(100); // dummy value meaning camera
-    } else if ((selectedName() >= 0) && (selectedName() < NumFaces)) {
-        setManipulatedFrame(cubik.faceCenterCube(selectedName())->getCubeFrame());
-        cubik.setSelectedFrameNumber(selectedName());
-    } else if ((selectedName() >= NumFaces) && (selectedName() < NumFaces+NumEdges+NumCorners)) {
-        Cube * ParentCube = cubik.edgeCornerCube(selectedName()-NumFaces)->parentCube;
-        setManipulatedFrame(ParentCube->getCubeFrame());
-        cubik.setSelectedFrameNumber(cubik.faceToIdx[(ParentCube->getCubeType())[0]]);
-    }
-    // in any case, need to update the parent-child cube relations here
+void Viewer::updateParent() {
     int selected = cubik.getSelectedFrameNumber();
     if ((selected >= 0) && (selected < NumFaces)) {
         Cube * ParentCube = cubik.faceCenterCube(selected);
@@ -321,12 +306,32 @@ void Viewer::postSelection(const QPoint&) {
     }
 }
 
+void Viewer::postSelection(const QPoint&) {
+    if ((manipulatedFrame()->isSpinning()) || cubik.checkResumeSpinning())
+        return;
+
+    cubik.updateEdgeCornerPosition();
+    if (selectedName() == -1) {
+        setManipulatedFrame(camera()->frame());
+        cubik.setSelectedFrameNumber(100); // dummy value meaning camera
+    } else if ((selectedName() >= 0) && (selectedName() < NumFaces)) {
+        setManipulatedFrame(cubik.faceCenterCube(selectedName())->getCubeFrame());
+        cubik.setSelectedFrameNumber(selectedName());
+    } else if ((selectedName() >= NumFaces) && (selectedName() < NumFaces+NumEdges+NumCorners)) {
+        Cube * ParentCube = cubik.edgeCornerCube(selectedName()-NumFaces)->parentCube;
+        setManipulatedFrame(ParentCube->getCubeFrame());
+        cubik.setSelectedFrameNumber(cubik.faceToIdx[(ParentCube->getCubeType())[0]]);
+    }
+    // in any case, need to update the parent-child cube relations here
+    updateParent();
+}
+
 void Viewer::keyPressEvent(QKeyEvent *e) {
     // Get event modifiers key
     const Qt::KeyboardModifiers modifiers = e->modifiers();
 
     bool handled = false;
-    if ((e->key()==Qt::Key_F) && (modifiers==Qt::NoButton)) {
+    if ((e->key()==Qt::Key_I) && (modifiers==Qt::NoButton)) {
         if (showIndicatorAxis)
             showIndicatorAxis = false;
         else if (!showIndicatorAxis)
@@ -345,10 +350,78 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
         }
         handled = true;
         updateGL();
+    } else if ((e->key() == Qt::Key_U) && (modifiers == Qt::NoButton)) {
+        doSelect(6);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_U) && (modifiers == Qt::SHIFT)) {
+        doSelect(0);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_D) && (modifiers == Qt::NoButton)) {
+        doSelect(1);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_D) && (modifiers == Qt::SHIFT)) {
+        doSelect(7);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_F) && (modifiers == Qt::NoButton)) {
+        doSelect(8);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_F) && (modifiers == Qt::SHIFT)) {
+        doSelect(2);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_B) && (modifiers == Qt::NoButton)) {
+        doSelect(3);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_B) && (modifiers == Qt::SHIFT)) {
+        doSelect(9);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_L) && (modifiers == Qt::NoButton)) {
+        doSelect(4);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_L) && (modifiers == Qt::SHIFT)) {
+        doSelect(10);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_R) && (modifiers == Qt::NoButton)) {
+        doSelect(11);
+        handled = true;
+        updateGL();
+    } else if ((e->key() == Qt::Key_R) && (modifiers == Qt::SHIFT)) {
+        doSelect(5);
+        handled = true;
+        updateGL();
     }
     
     if (!handled)
         QGLViewer::keyPressEvent(e);
+}
+
+void Viewer::doSelect(int idx) {
+    float a;
+    if (idx > 5) a = -sin(3.14 / 4);
+    else a = sin(3.14 / 4);
+    idx = idx % 6;
+    if (cubik.faceCenterCube(idx)->getCubeFrame()->isSpinning())
+        cubik.faceCenterCube(idx)->getCubeFrame()->stopSpinning();
+    cubik.updateEdgeCornerPosition();
+    setManipulatedFrame(cubik.faceCenterCube(idx)->getCubeFrame());
+    cubik.setSelectedFrameNumber(idx);
+    updateParent();
+    if ((idx == 0) || (idx == 1))
+        cubik.faceCenterCube(idx)->getCubeFrame()->rotate(0, a, 0, cos(3.14/4));
+    if ((idx == 2) || (idx == 3))
+        cubik.faceCenterCube(idx)->getCubeFrame()->rotate(0, 0, a, cos(3.14/4));
+    if ((idx == 4) || (idx == 5))
+        cubik.faceCenterCube(idx)->getCubeFrame()->rotate(a, 0, 0, cos(3.14/4));
+    cubik.faceCenterCube(idx)->getCubeFrame()->startSpinning(0.6);
 }
 
 void Viewer::mousePressEvent(QMouseEvent * e) {

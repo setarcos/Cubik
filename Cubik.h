@@ -135,6 +135,8 @@ private:
   void drawIndicatorAxis();
   void drawIndicatorCube();
   void drawHint();
+  void updateParent();
+  void doSelect(int idx);
 };
 
 #endif
