@@ -6,12 +6,7 @@ SOURCES  = Cubik.cpp solveCube.cpp cube.cpp main.cpp
 
 QT *= xml opengl widgets gui
 
-CONFIG += qt opengl warn_on thread rtti console c++11 ggdb3
-
-QMAKE_LIBS_OPENGL *= -lGLU
+CONFIG += qt opengl warn_on c++11 debug_and_release
 
 LIBS *= -lQGLViewer-qt5
-#INCLUDEPATH *= ./include
-#LIBS *= -L./lib -lQGLViewer
-
 
